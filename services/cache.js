@@ -21,10 +21,17 @@ mongoose.Query.prototype.exec = async function () { //arrow function is not used
 
     //if do return that value
     if (cachedValue) {
-        console.log(cachedValue);
+        const doc = JSON.parse(cachedValue);
+
+        return Array.isArray(doc) ?
+            doc.map(d => new this.model(d)) :
+            new this.model(doc);
     }
 
     //else return the data from mongo and set the key with value
     const result = await exec.apply(this, arguments); //here this has control on Query that gets produced
-    console.log(result);
+
+    client.set(key, JSON.stringify(result));
+
+    return result;
 }
