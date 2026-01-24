@@ -7,8 +7,18 @@ client.get = util.promisify(client.get);
 
 const exec = mongoose.Query.prototype.exec;
 
+mongoose.Query.prototype.cache = function () {
+    this.cacheable = true;
+    return this;
+}
+
 mongoose.Query.prototype.exec = async function () { //arrow function is not used as to refer exec instance on this at line 8
-    // console.log('IM ABOUT TO RUN A QUERY');
+    if (!this.cacheable) {
+        return exec
+            .apply(this, arguments);
+    }
+    else {
+       // console.log('IM ABOUT TO RUN A QUERY');
     // console.log(this.getQuery());
     // console.log(this.mongooseCollection.name);
     const key=JSON.stringify(Object.assign({}, this.getQuery(), {
@@ -33,5 +43,7 @@ mongoose.Query.prototype.exec = async function () { //arrow function is not used
 
     client.set(key, JSON.stringify(result));
 
-    return result;
+    return result; 
+    }
+    
 }
