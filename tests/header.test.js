@@ -21,7 +21,7 @@ describe('header test', () => {
 
   afterAll(async () => {
     if (browser) {
-      await browser.close();
+      // await browser.close();
     }
   });
 
@@ -30,12 +30,39 @@ describe('header test', () => {
       waitUntil: 'domcontentloaded',
     });
 
-await page.waitForSelector('#root', { timeout: 10000 });
+    await page.waitForSelector('#root', { timeout: 10000 });
 
-// 👀 wait 3 seconds to visually inspect
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // 👀 wait 1 second to visually inspect
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const text = await page.$eval('a.brand-logo', el => el.innerHTML);
     // console.log(text)
     expect(text).toEqual('Blogster')
- });
+  });
+  
+  test.only('when signed in, shows logout button', async () => {
+    const id = '696d28c9637d7533b37b98d5';
+    const Buffer = require('safe-buffer').Buffer;
+
+    const sessionObject = {
+      passport: {
+        user: id
+      }
+    };
+
+    const sessionString = Buffer.from(
+      JSON.stringify(sessionObject)
+    ).toString('base64');
+
+    const Keygrip = require('keygrip');
+    const keys = require('../config/dev');
+    const keygrip = new Keygrip([keys.cookieKey]);
+    const sig = keygrip.sign('session=' + sessionString);
+
+    await page.setCookie(
+      { name: 'session', value: sessionString, url: 'http://localhost:3000' },
+      { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
+    );
+
+    await page.goto('http://localhost:3000');
+  });
 });
