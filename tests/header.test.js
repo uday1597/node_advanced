@@ -21,7 +21,7 @@ describe('header test', () => {
 
   afterAll(async () => {
     if (browser) {
-      // await browser.close();
+      await browser.close();
     }
   });
 
@@ -40,7 +40,7 @@ describe('header test', () => {
   });
   
   test.only('when signed in, shows logout button', async () => {
-    const id = '696d28c9637d7533b37b98d5';
+    const id = '6978d209559356283ff25ea2';
     const Buffer = require('safe-buffer').Buffer;
 
     const sessionObject = {
@@ -62,7 +62,17 @@ describe('header test', () => {
       { name: 'session', value: sessionString, url: 'http://localhost:3000' },
       { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
     );
+    await page.goto('http://localhost:3000', {
+      waitUntil: 'networkidle0'
+    });
 
-    await page.goto('http://localhost:3000');
+    await page.waitForSelector('a[href="/auth/logout"]');
+
+    const text = await page.$eval(
+      'a[href="/auth/logout"]',
+      el => el.textContent.trim()
+    );
+
+    expect(text).toEqual('Logout');
   });
 });
