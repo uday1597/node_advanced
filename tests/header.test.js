@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 const sessionFactory = require('./factories/sessionFactory');
+const userFactory = require('./factories/userFactory');
+
 jest.setTimeout(30000);
 
 describe('header test', () => {
@@ -40,8 +42,9 @@ describe('header test', () => {
   });
   
   test('when signed in, shows logout button', async () => {
-    const { session, sig } = sessionFactory();
-    
+    const user = await userFactory();
+    const { session, sig } = sessionFactory(user);
+
     await page.setCookie(
       { name: 'session', value: session, url: 'http://localhost:3000' },
       { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
