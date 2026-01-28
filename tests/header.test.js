@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-
+const sessionFactory = require('./factories/sessionFactory');
 jest.setTimeout(30000);
 
 describe('header test', () => {
@@ -39,27 +39,11 @@ describe('header test', () => {
     expect(text).toEqual('Blogster')
   });
   
-  test.only('when signed in, shows logout button', async () => {
-    const id = '6978d209559356283ff25ea2';
-    const Buffer = require('safe-buffer').Buffer;
-
-    const sessionObject = {
-      passport: {
-        user: id
-      }
-    };
-
-    const sessionString = Buffer.from(
-      JSON.stringify(sessionObject)
-    ).toString('base64');
-
-    const Keygrip = require('keygrip');
-    const keys = require('../config/dev');
-    const keygrip = new Keygrip([keys.cookieKey]);
-    const sig = keygrip.sign('session=' + sessionString);
-
+  test('when signed in, shows logout button', async () => {
+    const { session, sig } = sessionFactory();
+    
     await page.setCookie(
-      { name: 'session', value: sessionString, url: 'http://localhost:3000' },
+      { name: 'session', value: session, url: 'http://localhost:3000' },
       { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
     );
     await page.goto('http://localhost:3000', {
