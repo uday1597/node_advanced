@@ -20,22 +20,26 @@ class CustomPage {
     });
   }
 
-    constructor(page) {
-    this.page = page;
-    }
+  constructor(page) {
+  this.page = page;
+  }
 
-    async login() {
+  async login() {
 
-    const user = await userFactory();
-    const { session, sig } = sessionFactory(user);
-        
-    await this.page.setCookie(
-        { name: 'session', value: session, url: 'http://localhost:3000' },
-        { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
-    );
+  const user = await userFactory();
+  const { session, sig } = sessionFactory(user);
       
-    await this.page.goto('http://localhost:3000');
-    await this.page.waitFor('a[href="/auth/logout"]');
+  await this.page.setCookie(
+      { name: 'session', value: session, url: 'http://localhost:3000' },
+      { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
+  );
+    
+  await this.page.goto('http://localhost:3000');
+  await this.page.waitFor('a[href="/auth/logout"]');
+  }
+  
+  async getContentsOf(selector) {
+    return this.page.$eval(selector, el => el.innerHTML);
   }
 }
 

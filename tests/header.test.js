@@ -20,10 +20,7 @@ describe('header test', () => {
 
     await page.waitForSelector('#root', { timeout: 10000 });
 
-    const text = await page.$eval(
-      'a.brand-logo',
-      el => el.innerHTML
-    );
+    const text = await page.getContentsOf('a.brand-logo');
 
     expect(text).toEqual('Blogster');
   });
