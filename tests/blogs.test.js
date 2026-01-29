@@ -2,13 +2,13 @@ const Page = require('./helpers/page');
 
 let page;
 
-  beforeAll(async () => {
+beforeAll(async () => {
     page = await Page.build();
-  });
+});
 
-  afterAll(async () => {
+afterAll(async () => {
     await page.close();
-  });
+});
 
 describe('When logged in', async () => {
     beforeEach(async () => {
@@ -60,4 +60,22 @@ describe('When logged in', async () => {
             expect(contentError).toEqual('You must provide a value');
         });
     });
-})
+});
+
+describe('When user is not logged in', async () => {
+    beforeEach(async () => {
+        await page.logout();
+    });
+
+    test('User can not create a blog post', async () => {
+        const result = await page.evaluate(() => {
+            return fetch('/api/blogs', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: 'My Title', content: 'My Content' })
+            }).then(res => res.json());
+        });
+        expect(result.error).toEqual('You must log in!');
+    });
+});

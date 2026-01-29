@@ -24,20 +24,30 @@ class CustomPage {
   this.page = page;
   }
 
-  async login() {
+async login() {
 
   const user = await userFactory();
   const { session, sig } = sessionFactory(user);
-      
-  await this.page.setCookie(
-      { name: 'session', value: session, url: 'http://localhost:3000' },
-      { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
-  );
     
+  await this.page.setCookie(
+    { name: 'session', value: session, url: 'http://localhost:3000' },
+    { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
+  );
+  
   await this.page.goto('http://localhost:3000/blogs');
   await this.page.waitFor('a[href="/auth/logout"]');
-  }
+}
   
+async logout() {
+  await this.page.deleteCookie(
+    { name: 'session', url: 'http://localhost:3000' },
+    { name: 'session.sig', url: 'http://localhost:3000' }
+  );
+
+  await this.page.goto('http://localhost:3000');
+}
+
+
   async getContentsOf(selector) {
     return this.page.$eval(selector, el => el.innerHTML);
   }
