@@ -34,7 +34,7 @@ class CustomPage {
       { name: 'session.sig', value: sig, url: 'http://localhost:3000' }
   );
     
-  await this.page.goto('http://localhost:3000');
+  await this.page.goto('http://localhost:3000/blogs');
   await this.page.waitFor('a[href="/auth/logout"]');
   }
   
