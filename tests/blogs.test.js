@@ -63,7 +63,7 @@ describe('When logged in', async () => {
 });
 
 describe('When user is not logged in', async () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
         await page.logout();
     });
 
@@ -74,6 +74,16 @@ describe('When user is not logged in', async () => {
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: 'My Title', content: 'My Content' })
+            }).then(res => res.json());
+        });
+        expect(result.error).toEqual('You must log in!');
+    });
+    test('User can not get a list blog posts', async () => {
+        const result = await page.evaluate(() => {
+            return fetch('/api/blogs', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
             }).then(res => res.json());
         });
         expect(result.error).toEqual('You must log in!');
