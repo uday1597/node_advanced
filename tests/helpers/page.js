@@ -5,7 +5,8 @@ const userFactory = require('../factories/userFactory');
 class CustomPage {
   static async build() {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,  //flip this to false when runningin dev to see chromium tab open and run tests visibly
+      args:[--no-sandbox], //even this is for ci. this will decrease the time to run tests in ci.  
       executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });

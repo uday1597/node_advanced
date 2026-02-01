@@ -1,46 +1,143 @@
+# ------------------------------------------------------
+# Workflow name
+# This name appears in the GitHub Actions UI.
+# It represents a CI/CD workflow that builds, starts,
+# and tests the application.
+# ------------------------------------------------------
 name: deploy
- 
+
+# ------------------------------------------------------
+# Workflow triggers
+# Defines WHEN this workflow should run.
+# ------------------------------------------------------
 on:
+  # Run the workflow whenever code is pushed to main branch
   push:
     branches: [main]
+
+  # Run the workflow for pull requests targeting main
+  # This helps catch issues before merging
   pull_request:
     branches: [main]
- 
+
+# ------------------------------------------------------
+# Jobs section
+# A workflow can have multiple jobs.
+# Each job runs in an isolated VM.
+# ------------------------------------------------------
 jobs:
   build:
+    # --------------------------------------------------
+    # Runner environment
+    # ubuntu-latest is commonly used for Node.js apps
+    # --------------------------------------------------
     runs-on: ubuntu-latest
- 
+
+    # --------------------------------------------------
+    # Strategy matrix
+    # Allows running the same job with different configs.
+    # Here it’s used for Node.js version testing.
+    # Useful when you want to support multiple Node versions.
+    # --------------------------------------------------
     strategy:
       matrix:
         node-version: ["18.15.0"]
- 
+
+    # --------------------------------------------------
+    # Service containers
+    # These spin up Docker containers that your app
+    # can connect to during tests.
+    # --------------------------------------------------
     services:
+      # MongoDB service for backend/database tests
       mongodb:
         image: mongo
         ports:
           - 27017:27017
+
+      # Redis service for caching / queues / sessions
       redis:
         image: redis
         ports:
           - 6379:6379
- 
+
+    # --------------------------------------------------
+    # Environment variables
+    # Available to ALL steps in this job.
+    # --------------------------------------------------
     env:
+      # Indicates CI environment (can be used in code to
+      # disable logs, use test configs, etc.)
       NODE_ENV: ci
+
+      # Port on which the server will run in CI
       PORT: 3000
- 
+
+    # --------------------------------------------------
+    # Steps
+    # Steps run sequentially inside the job.
+    # --------------------------------------------------
     steps:
+      # ----------------------------------------------
+      # Checkout repository code
+      # Required so the runner has access to your code.
+      # ----------------------------------------------
       - uses: actions/checkout@v2
+
+      # ----------------------------------------------
+      # Setup Node.js
+      # Uses the version defined in the matrix.
+      # Ensures consistent runtime across environments.
+      # ----------------------------------------------
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      # ----------------------------------------------
+      # Cache npm dependencies
+      #
+      # Why:
+      # - Speeds up npm install
+      # - Reuses downloaded packages across runs
+      #
+      # How:
+      # - Cache key is based on package-lock.json
+      # - If lock file doesn't change, cache is reused
+      # - If it changes, cache is automatically invalidated
+      # ----------------------------------------------
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      # ----------------------------------------------
+      # Install dependencies & build
+      # --legacy-peer-deps is used to avoid dependency
+      # resolution failures (common in CI environments).
+      # Build step ensures the app compiles successfully.
+      # ----------------------------------------------
       - name: Install Dependencies
         run: |
           npm install --legacy-peer-deps
           npm run build
+
+      # ----------------------------------------------
+      # Start the server
+      # nohup + & runs the server in background so
+      # the workflow can continue.
+      # sleep ensures the server is fully up before tests.
+      # ----------------------------------------------
       - name: Start server
         run: |
           nohup npm run start &
           sleep 3
+
+      # ----------------------------------------------
+      # Run automated tests
+      # Tests run against the live server and
+      # connected services (MongoDB, Redis).
+      # ----------------------------------------------
       - name: Run tests
         run: npm run test
