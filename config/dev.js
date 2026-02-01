@@ -5,4 +5,5 @@ module.exports = {
   mongoURI:
     "mongodb://localhost:27017/node",
   cookieKey: "123123123",
+  redisUrl: "redis://127.0.01:6379"
 };
