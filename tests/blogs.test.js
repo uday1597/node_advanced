@@ -62,30 +62,30 @@ describe('When logged in', async () => {
     });
 });
 
-describe('When user is not logged in', async () => {
+describe('User is not logged in', async () => {
     beforeAll(async () => {
         await page.logout();
     });
+    const actions = [
+        {
+            method: 'get',
+            path: '/api/blogs'
+        },
+        {
+            method: 'post',
+            path: '/api/blogs',
+            data: {
+                title: 'T',
+                content: 'C'
+            }
+        }
+    ];
 
-    test('User can not create a blog post', async () => {
-        const result = await page.evaluate(() => {
-            return fetch('/api/blogs', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: 'My Title', content: 'My Content' })
-            }).then(res => res.json());
-        });
-        expect(result.error).toEqual('You must log in!');
-    });
-    test('User can not get a list blog posts', async () => {
-        const result = await page.evaluate(() => {
-            return fetch('/api/blogs', {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-            }).then(res => res.json());
-        });
-        expect(result.error).toEqual('You must log in!');
+    test('Blog related actions are prohibited', async () => {
+        const results = await page.execRequests(actions);
+
+        for (let result of results) {
+            expect(result).toEqual({ error: 'You must log in!' });
+        }
     });
 });
