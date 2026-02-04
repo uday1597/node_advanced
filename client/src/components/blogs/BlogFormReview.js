@@ -45,7 +45,7 @@ class BlogFormReview extends Component {
 
     const { submitBlog, history, formValues } = this.props;
 
-    submitBlog(formValues, this.state.file,  history);
+    submitBlog(formValues, this.state.file, history);
   }
 
   onFileChange(event) {
@@ -60,11 +60,12 @@ class BlogFormReview extends Component {
         {this.renderFields()}
 
         <h5>Add an Image</h5>
-        <input
+        <p>
+          <input
           onChange={this.onFileChange.bind(this)}
           type="file"
           accept="image/*" />
-
+        </p>
         {this.renderButtons()}
       </form>
     );
