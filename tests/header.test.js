@@ -14,7 +14,7 @@ describe('header test', () => {
   });
 
   test('should load localhost:3000', async () => {
-    await page.goto('http://localhost:3000', {
+    await page.goto('https://localhost:3000', {
       waitUntil: 'domcontentloaded',
     });
 
