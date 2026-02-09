@@ -13,7 +13,7 @@ class BlogShow extends Component {
       return (
         <img
           src={imageSrc}
-          alt="Blog cover image"
+          alt={this.props.blog.title}
           style={{
           maxWidth: '100%',
           height: 'auto'
