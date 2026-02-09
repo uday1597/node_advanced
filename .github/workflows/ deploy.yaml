@@ -129,10 +129,7 @@ jobs:
       # the workflow can continue.
       # sleep ensures the server is fully up before tests.
       # ----------------------------------------------
-      - name: Start server
-        run: |
-          nohup npm run start &
-          sleep 3
+     
 
       # ----------------------------------------------
       # Run automated tests
