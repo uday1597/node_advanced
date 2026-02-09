@@ -13,7 +13,6 @@ class BlogShow extends Component {
       return (
         <img
           src={imageSrc}
-          alt="image from s3"
           style={{
             maxWidth: '100%',
             height: 'auto'
