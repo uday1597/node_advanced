@@ -140,4 +140,5 @@ jobs:
       # connected services (MongoDB, Redis).
       # ----------------------------------------------
       - name: Run tests
-        run: npm run test
+        run: npm run test:e2e
+
