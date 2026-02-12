@@ -31,6 +31,10 @@ class CustomPage {
   async login() {
     const user = await userFactory();
     const { session, sig } = sessionFactory(user);
+    await this.page.goto('http://localhost:3000', {
+      waitUntil: 'networkidle2',
+      timeout: 60000
+    });
 
     await this.page.setCookie(
       { name: 'session', value: session, url: 'http://localhost:3000' },
